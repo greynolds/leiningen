@@ -1,20 +1,24 @@
 # Profiles
 
+## The Customization Problem
+
 Leiningen's `:profile` option is designed to address the problem of
 customization.  The general idea is that every tool (in this case,
 Leiningen) comes with a default configuration.  The default tool
 configuration is effectively global - it is in effect by default
-wherever the tool is used.  Different systems (or "installations") may
-have different needs, so they need to be able to customize the
-configuration by overriding default settings (e.g. by adding a search
-path).  Within each system, different workgroups may have different
-needs or policies, so they too want to be able to refine the system
-settings.  Within workgroups, individual developers (notoriously) may
-have their own ideas about proper Theology and Geometry, so they want
-to set their own configuration.  Finally, specific projects may call
-for customizations as well.  Since each developer works on private
-copies of projects, per-developer per-project customization support
-may be needed.
+whenever and wherever the tool is used.  Different systems (or
+"installations") may have different needs, so they need to be able to
+customize the configuration by overriding default settings (e.g. by
+adding a search path).  Within each system, different workgroups may
+have different needs or policies, so they too want to be able to
+refine the system settings.  Within workgroups, individual developers
+(notoriously) may have their own ideas about proper Theology and
+Geometry, so they want to set their own configuration.  Finally,
+specific projects may call for customizations as well.  Per-project
+configuration defaults may cut across organizational levels (multiple
+organizations and/or groups may work on one project - e.g. Leiningen),
+but since each developer works on private copies of projects,
+per-developer per-project customization support may be needed as well.
 
 But that's not all.  The various phases of development - dev, unit
 test, system test, etc. - may also require distinct configurations;
@@ -24,20 +28,32 @@ configuration and customization: one cuts across organizations and
 individuals, and the other cuts across activity types.
 
 For example, company policy might stipulate that all developers on all
-projects use some kind of quality assurance tool (such as a particular
-pretty-print facility); to enforce this, a configuration option for
-Leiningen may be set at the system level.  A particular workgroup
-might decide to use some sort of a tool or configuration option that
-other groups do not want to use; this could be specified in a
-configuration file accessible only to that group.  Individual
-developers will commonly have their own preferences for certain
-things, which they can specify using `~/.lein/profiles.clj`, which has
-the effect of enabling them for every use of Leiningen by that user.
-For a specific project, a specific developer may need some custom
-configuration, which can be set in the project.clj.  Each of these
-customizations may involve overrides and/or extensions.  Furthermore
-distinct customization structures may be called for for e.g. dev and
-test phases.
+projects use some kind of quality assurance tool (for example,
+something that enforces code formatting rules); to enforce this, a
+configuration option for Leiningen may be set at the system level.  A
+particular workgroup might decide to use some sort of a tool or
+configuration option that other groups do not want to use; this can be
+supported by designating distinct (but shared within group)
+configuration files for each group.  Individual developers will
+commonly have their own preferences for certain things, which they can
+specify using `~/.lein/profiles.clj`, which has the effect of enabling
+them for every use of Leiningen by that user.  For a specific project,
+a specific developer may need some custom configuration, which can be
+set in the project.clj.  Each of these customizations may involve
+overrides and/or extensions.  Furthermore distinct customization
+structures may be called for for e.g. dev and test phases.
+
+(We can add another "axis of configuration".  The organization-based
+config/customize system described above is project-independent.  In
+the end, the result of config/customize is a particular configuration
+for a particular use of the tool; as described, this would be a
+general config.  But we work on projects, so we need project-specific
+configs as well.  The project.clj stored with the source in the
+repository represents a global configuration.  It can be customized by
+settings at the :system and :user levels.  But each developer works on
+a private copy of the project, so per-user, per-project customization
+is also possible.  So in addition to activity- and organization-based
+configuration and customization, we also have project-based C&C.)
 
 Leiningen customization using profiles follows a standard
 customization strategy: to support organization-based customizations,
@@ -49,7 +65,28 @@ provides a few predefined activity-based profiles (:dev, :test,
 :production) and supports definition of user-defined profiles that can
 be declared at any level of the organizational hierarchy.
 
+(In other words, activity-based customization depends both on the
+ability to name sets of customizations and the ability to set the
+corresponding named "mode" for the tool.  Having a set of
+customizations called :test is useless without a way of also telling
+the tool to use that set - i.e. to "run in test mode".  That is what
+Leiningen's profiles are for.  By contrast, organization-based
+customization is supported by read-and-override involving a hierarchy
+of configuration files.
+
+Leiningen actually confuses this a bit by naming organization-based
+configuration sets (i.e. :system and :user).  The same thing can be
+accomplished just by means of an override mechanism.  E.g. whatever is
+in my personal ~/.lein/profiles.clj overrides the system and global
+stuff.  I just use the activity-based tags to set e.g. test config.  I
+don't need a :user profile to do this, since by definition anything in
+my personal ~/.lein/profiles.clj counts as part of my user profile.
+
+But that's just an implementation strategy.  The way Leiningen does it
+also works, it's just a little more confusing.
+
 ;;;;;;;;;;;;;;;;
+
 In Leiningen 2.x you can change the configuration of your project by
 applying various profiles. For instance, you may want to have a few
 extra test data directories on the classpath during development
