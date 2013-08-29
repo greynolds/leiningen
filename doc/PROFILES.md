@@ -50,10 +50,24 @@ for a particular use of the tool; as described, this would be a
 general config.  But we work on projects, so we need project-specific
 configs as well.  The project.clj stored with the source in the
 repository represents a global configuration.  It can be customized by
-settings at the :system and :user levels.  But each developer works on
-a private copy of the project, so per-user, per-project customization
-is also possible.  So in addition to activity- and organization-based
-configuration and customization, we also have project-based C&C.)
+settings at the system and user levels, by setting options in config
+files.  But those options would then apply across projects, since we
+have no way of setting project-specific options except in project.clj.
+But each developer works on a private copy of the project, so
+per-user, per-project customization is also possible.  So in addition
+to activity- and organization-based configuration and customization,
+we also have project-based C&C.  Note that to support e.g. system,
+workgroup, and user-level project-specific customizations we would
+have to add some means of referring to specific projects in our
+generic config files.  For example,
+```clj
+:projprofile {:proj "leiningen" :version "2.3.3-SNAPSHOT"
+	     {:resource-paths ...}}
+```
+
+or something like that.  That way an individual developer could modify
+the project config without mucking about in project.clj.  But maybe
+there's a way to do this already in Leiningen?)
 
 Leiningen customization using profiles follows a standard
 customization strategy: to support organization-based customizations,
@@ -84,6 +98,19 @@ my personal ~/.lein/profiles.clj counts as part of my user profile.
 
 But that's just an implementation strategy.  The way Leiningen does it
 also works, it's just a little more confusing.
+
+### Configuration files
+
+ * etc/leiningen
+
+ * ~/.lein/profiles.clj -- contains profile definition clauses like
+   `{:user {:dependencies ...}}`
+
+ * ~/.lein/profiles.d/foo.clj -- by definition, defines profile ":foo"
+
+ * project.clj  (globally, in repo; locally, project root local to user)
+
+
 
 ;;;;;;;;;;;;;;;;
 
