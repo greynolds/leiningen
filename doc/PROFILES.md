@@ -1,6 +1,6 @@
 # Profiles
 
-## The Customization Problem
+## Disquisition:  Configuration & Customization (C&C)
 
 Leiningen's `:profile` option is designed to address the problem of
 customization.  The general idea is that every tool (in this case,
@@ -82,11 +82,14 @@ be declared at any level of the organizational hierarchy.
 (In other words, activity-based customization depends both on the
 ability to name sets of customizations and the ability to set the
 corresponding named "mode" for the tool.  Having a set of
-customizations called :test is useless without a way of also telling
-the tool to use that set - i.e. to "run in test mode".  That is what
-Leiningen's profiles are for.  By contrast, organization-based
+customizations called :foo is useless without a way of also telling
+the tool to use that set - i.e. to "run in foo mode".  That is what
+Leiningen's `with-profile` is for.  By contrast, organization-based
 customization is supported by read-and-override involving a hierarchy
-of configuration files.
+of configuration files regardless of mode.)
+
+*Q* There seems to be an implicit "test mode" for `lein test`; is that
+true?  Any other implicit modes?
 
 Leiningen actually confuses this a bit by naming organization-based
 configuration sets (i.e. :system and :user).  The same thing can be
@@ -99,6 +102,16 @@ my personal ~/.lein/profiles.clj counts as part of my user profile.
 But that's just an implementation strategy.  The way Leiningen does it
 also works, it's just a little more confusing.
 
+NB: we can define e.g. a "foo" profile at any level, then override it
+just like any other profile.  So an org might define profile :foo in
+etc/leiningen, a user might customize in ~/.lein/profiles.clj and in
+<projroot>/project.clj.  Is this then org-based, activity-based, or
+project-based?  Is that even a useful question?  Presumably one would
+define profile :foo for a reason having to do with how one runs
+something, hence activity-based.  But maybe not; maybe it's intended
+for all activities.  In that case, you would not define :foo, you
+would customize the :system profile.
+
 ### Configuration files
 
  * etc/leiningen
@@ -108,11 +121,27 @@ also works, it's just a little more confusing.
 
  * ~/.lein/profiles.d/foo.clj -- by definition, defines profile ":foo"
 
- * project.clj  (globally, in repo; locally, project root local to user)
+ * project.clj  (globally, in repo; locally, in project root local to user)
 
 
+### Predefined Profiles
 
-;;;;;;;;;;;;;;;;
+In addition to the Big Five:
+
+ * repl
+
+ * test
+
+ * uberjar
+
+### Modes (Activity Types?)
+
+Default mode ...
+
+The repl, test, and uberjar tasks check for profiles of the same name,
+so essentially each can be viewed as an execution mode.
+
+# Profiles
 
 In Leiningen 2.x you can change the configuration of your project by
 applying various profiles. For instance, you may want to have a few
