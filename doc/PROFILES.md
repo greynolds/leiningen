@@ -1,11 +1,128 @@
 # Profiles
 
+Leiningen's `:profile` option is designed to address the problem of
+customization.  The general idea is that every tool (in this case,
+Leiningen) comes with a default configuration.  The default tool
+configuration is effectively global - it is in effect by default
+wherever the tool is used.  Different systems (or "installations") may
+have different needs, so they need to be able to customize the
+configuration by overriding default settings (e.g. by adding a search
+path).  Within each system, different workgroups may have different
+needs or policies, so they too want to be able to refine the system
+settings.  Within workgroups, individual developers (notoriously) may
+have their own ideas about proper Theology and Geometry, so they want
+to set their own configuration.  Finally, specific projects may call
+for customizations as well.  Since each developer works on private
+copies of projects, per-developer per-project customization support
+may be needed.
+
+But that's not all.  The various phases of development - dev, unit
+test, system test, etc. - may also require distinct configurations;
+these will need to apply across organization levels, and may also
+require customization.  So we actually have two, orthogonal lines of
+configuration and customization: one cuts across organizations and
+individuals, and the other cuts across activity types.
+
+For example, company policy might stipulate that all developers on all
+projects use some kind of quality assurance tool (such as a particular
+pretty-print facility); to enforce this, a configuration option for
+Leiningen may be set at the system level.  A particular workgroup
+might decide to use some sort of a tool or configuration option that
+other groups do not want to use; this could be specified in a
+configuration file accessible only to that group.  Individual
+developers will commonly have their own preferences for certain
+things, which they can specify using `~/.lein/profiles.clj`, which has
+the effect of enabling them for every use of Leiningen by that user.
+For a specific project, a specific developer may need some custom
+configuration, which can be set in the project.clj.  Each of these
+customizations may involve overrides and/or extensions.  Furthermore
+distinct customization structures may be called for for e.g. dev and
+test phases.
+
+Leiningen customization using profiles follows a standard
+customization strategy: to support organization-based customizations,
+define a set of configuration files and an override or combination
+mechanism such that, when the files are read and interpreted in the
+right order, the various levels of customization outlined above are
+possible.  To support customization based on activity type, Leiningen
+provides a few predefined activity-based profiles (:dev, :test,
+:production) and supports definition of user-defined profiles that can
+be declared at any level of the organizational hierarchy.
+
+;;;;;;;;;;;;;;;;
 In Leiningen 2.x you can change the configuration of your project by
 applying various profiles. For instance, you may want to have a few
 extra test data directories on the classpath during development
 without including them in the jar, or you may want to have Slamhound
 available in every project you hack on without modifying every single
 project.clj you use.
+
+Each Leiningen task uses a particular combination of profiles.  You
+can think of each task as executing in a particular "mode", which is
+characterized by the project map Leiningen assembles before launching
+the task.  Most standard tasks run in what we'll call default mode.
+The *test* task, in contrast, runs in test mode.  (We use the term
+"mode" here as a convenient way of referring to the fact that
+different tasks may select different combinations of profiles for use
+in constructing the project map.)
+
+Because support for profiles is implemented using ordinary project
+options, Leiningen configurations are completely customizable.
+
+The `with-profile` subtask allows you to specify the profile to be
+used for a particular task.  You can define your own profiles for use
+with `with-profile`.
+
+*CAVEAT* Leiningen defines a small set of profiles whose use is
+ described below, but it also defines a set of configuration files
+ that are scanned in a particular order for profile (and other)
+ declarations whenever Leiningen runs.  This provides a means of both
+ setting and overriding values on a per-system, per-user, and
+ per-project basis.  The result is that the effective project map
+ depends not only on which profiles are defined but where they are
+ defined.  Details below.
+
+## Default Profile
+
+All tasks use the following five profiles, which together are called
+the `:default` profile:
+
+ *  :base, :system, and :user support per-system and per-user customizations
+ *  :dev supports customizations for the default activity
+ *  :provided supports customizations driven by use of Java frameworks
+
+The :base profile is a global profile designed to provide the basic
+functionalities needed by every use of Leiningen.  This includes, for
+example, adding `org.clojure/tools.nrepl` to the project
+:dependencies.  The default value for :base is hard-coded in the
+Leiningen codebase, but since it is an ordinary option it can be
+overridden.
+
+The `:system` and `:user` profiles are intended to allow workgroups
+and individuals respectively to customize their work.  The intended
+use pattern is that `:system` should be declared in `/etc/leiningen`,
+which, on a properly configured system, would be shared by a group of
+users.  Similarly, :user is intended for use in ~/.lein/profiles.clj,
+since declarations found there apply to every Leiningen task the user
+runs.  For example, you can specify that the `lein-pprint` plugin
+should always be enabled.
+
+The :dev profile is designed to support, development-phase
+customization; it should be declared in the project.clj file.  Note
+that and explicit :project profile is not needed, since the top-level
+project options in project.clj effectively implicitly define such a
+profile.  So :dev is an activity-based profile.
+
+The :provided profile is designed to support a standard usage pattern
+associated with Frameworks.  Many Java frameworks expect deployment of
+a jar file or derived archive sub-format containing a subset of the
+application's necessary dependencies.  The framework expects to
+provide the missing dependencies itself at run-time.  Dependencies
+which are provided by a framework in this fashion may be specified in
+the `:provided` profile.  Such dependencies will be available during
+compilation, testing, etc., but won't be included by default by the
+`uberjar` task or plugin tasks intended to produce stable deployment
+artifacts.
 
 By default the `:dev`, `:provided`, `:user`, `:system`, and `:base`
 profiles are activated for each task, but their settings are not

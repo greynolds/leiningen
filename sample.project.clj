@@ -236,6 +236,8 @@
   ;; Paths that contain "inputs" are vectors, "outputs" are strings.
   :source-paths ["src" "src/main/clojure"]
   :java-source-paths ["src/main/java"] ; Java source is stored separately.
+  ;; test source paths (use :profiles {:test ...} to configure
+  ;; e.g. test runtime classpath (using :dependencies))
   :test-paths ["test" "src/test/clojure"]
   :resource-paths ["src/main/resource"] ; Non-code files included in classpath/jar.
   ;; All generated files will be placed here. In order to avoid cross-profile
