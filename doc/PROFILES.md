@@ -111,6 +111,9 @@ my personal ~/.lein/profiles.clj counts as part of my user profile.
 But that's just an implementation strategy.  The way Leiningen does it
 also works, it's just a little more confusing.
 
+*TO ADD* compare Leiningen's way of merging maps with "standard" tools 
+e.g. https://github.com/typesafehub/config, libconfig, libcfg, etc.
+
 NB: we can define e.g. a "foo" profile at any level, then override it
 just like any other profile.  So an org might define profile :foo in
 etc/leiningen, a user might customize in ~/.lein/profiles.clj and in
