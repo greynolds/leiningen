@@ -69,6 +69,15 @@ or something like that.  That way an individual developer could modify
 the project config without mucking about in project.clj.  But maybe
 there's a way to do this already in Leiningen?)
 
+(In other words, version control systems clash with standard C&C
+practice.  Normally, a config file in the current directory overrides
+user settings specified in ~/.foo.  But when the config file in the
+current directory is checked out from a repository, we might want to
+override some of its settings - e.g. to experiment - but we don't want
+to edit it, to avoid inadvertently pushing transient changes.  So in
+this case it would be useful to have some means of using
+~/.lein/profile to override project.clj settings.)
+
 Leiningen customization using profiles follows a standard
 customization strategy: to support organization-based customizations,
 define a set of configuration files and an override or combination
