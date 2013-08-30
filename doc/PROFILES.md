@@ -97,8 +97,13 @@ Leiningen's `with-profile` is for.  By contrast, organization-based
 customization is supported by read-and-override involving a hierarchy
 of configuration files regardless of mode.)
 
-*Q* There seems to be an implicit "test mode" for `lein test`; is that
-true?  Any other implicit modes?
+(TODO: instead of "activity", e.g. :test is for the test activity or
+phase, express this in terms of per-task customizations.  An example
+of a per-task customization is the :test profile, which "applies" to
+the `test` task only.  (Alternatively call them activities instead of
+tasks.)  Other per-task profiles are :repl and uberjar (any others?).
+Note that per-task profiles can be specified at any organization
+level.)
 
 Leiningen actually confuses this a bit by naming organization-based
 configuration sets (i.e. :system and :user).  The same thing can be

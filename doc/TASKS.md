@@ -1,5 +1,10 @@
 # Tasks
 
+## Task Profiles
+
+Some tasks are associated with a profile of the same name, so you can
+make per-task customizations.
+
 ## Task-specific options
 
 NB: The Leiningen source sometimes uses "key" instead of "option".
