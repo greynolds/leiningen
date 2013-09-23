@@ -9,6 +9,15 @@
   (:import java.io.File
            javax.tools.ToolProvider))
 
+(defn- get-pfx-sfx-combos
+  "Combine each pfx with each sfx"
+  [pfxes sfxes & separator]
+  (flatten
+   (let [sep (if separator separator "/")]
+     (for [pfx pfxes]
+       (for [sfx sfxes]
+          (string/join sep [pfx sfx]))))))
+
 (defn- stale-java-sources
   "Returns a lazy seq of file paths: every Java source file within
   dirs modified since it was most recently compiled into
@@ -112,7 +121,15 @@
   bootclasspath."
   [project args]
   (let [compile-path (:compile-path project)
-        files (stale-java-sources (:java-source-paths project) compile-path)
+        allfiles (stale-java-sources (:java-source-paths project) compile-path)
+        exclusions (get-pfx-sfx-combos (:java-source-paths project)
+                                       (:java-source-exclude project))
+        files (filter (fn [f] (not (some
+                                    #(re-matches
+                                      (re-pattern (str "^" % ".*"))
+                                      f)
+                                    exclusions)))
+                      allfiles)
         javac-opts (vec (javac-options project files args))
         form (subprocess-form compile-path files javac-opts)]
     (when (seq files)

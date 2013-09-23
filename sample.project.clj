@@ -236,7 +236,10 @@
   ;; Paths that contain "inputs" are vectors, "outputs" are strings.
   :source-paths ["src" "src/main/clojure"]
   :java-source-paths ["src/main/java"] ; Java source is stored separately.
-  :java-source-exclude ["src/main/java/foo.java"] ; don't javac these
+  ;; javac exclusions - vector of file and dir names to exclude from compile
+  :java-source-exclude
+  	["org/example/foo.java" ; don't javac src/main/java/org/example/foo.java
+   	"org/example/bar"]  ;; don't javac anything below src/main/java/org/example/bar
   :test-paths ["test" "src/test/clojure"]
   :resource-paths ["src/main/resource"] ; Non-code files included in classpath/jar.
   ;; All generated files will be placed here. In order to avoid cross-profile
